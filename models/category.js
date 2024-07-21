@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const { options } = require('../routes/categories');
 module.exports = (sequelize, DataTypes) => {
   class Category extends Model {
     /**
@@ -14,9 +15,27 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Category.init({
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: {
+        args: true,
+        msg: 'name kategori sudah ada, silahkan masukan kategori lain'
+      },
+      validate: {
+        notNull: {
+          msg: 'inputan data name kategori tidak boleh kosong'
+        }
+      }
+    },
     description: DataTypes.TEXT
   }, {
+    hooks: {
+      afterValidate: (category, options) => {
+        category.name = category.name.toLowerCase() ;
+      }
+    }, 
+
     sequelize,
     modelName: 'Category',
   });
