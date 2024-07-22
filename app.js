@@ -3,6 +3,7 @@ const app = express();
 const dotenv = require('dotenv')
 const cors = require('cors')
 const CategoriesRouter = require('./routes/categories')
+const AuthRouter = require('./routes/AuthRoutes')
 const morgan = require('morgan')
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors())
 
 //Routing
 app.use('/api/v1/categories', CategoriesRouter);
+app.use('/api/v1/auth', AuthRouter);
 
 //Server
 const port = process.env.PORT
