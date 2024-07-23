@@ -1,14 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const { getAllCategories, storeCategory, detailCategory, updateCategory, deleteCategory } = require('../controllers/categoryController')
-const { authMiddleware } = require('../middleware/UserMiddleware')
+const { authMiddleware, permissionUser } = require('../middleware/UserMiddleware')
 
 router.get('/', getAllCategories)
-
-router.post('/', storeCategory)
-router.get('/:id', authMiddleware, detailCategory)
-router.put('/:id', updateCategory)
-router.delete('/:id', deleteCategory)
+router.get('/:id', detailCategory)
+router.post('/', authMiddleware, permissionUser("admin"), storeCategory)
+router.put('/:id', authMiddleware, permissionUser("admin"), updateCategory)
+router.delete('/:id', authMiddleware, permissionUser("admin"), deleteCategory)
 
 router.get('/filterData',(req, res) => {
     res.send('route filter data')
