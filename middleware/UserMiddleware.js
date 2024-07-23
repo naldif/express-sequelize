@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const {
-    User
+    User,
+    Role
 } = require('../models');
 
 exports.authMiddleware = async (req, res, next) => {
@@ -34,11 +35,27 @@ exports.authMiddleware = async (req, res, next) => {
     if(!currentUser){
         return next(res.status(401).json({
             status: 401,
-            message: "User sudah terhapus token sudah tidak bisa di gunakan"
+            message: "User sudah terhapus token sudah tidak bisa di gunakan "
         }))
     }
-    req.user;
+    req.user = currentUser;
 
     next()
+}
 
+exports.permissionUser = (...roles) => {
+    return async(req, res, next) => {
+        const rolesData = await Role.findByPk(req.user.role_id)
+
+        const roleName = rolesData.name
+
+        if(!roles.includes(roleName)) {
+            return next(res.status(403).json({
+                status: 403,
+                error: "Anda tidak dapat mengakses halaman ini!"
+            }))
+        }
+
+        next()
+    }
 }
