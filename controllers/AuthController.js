@@ -9,6 +9,27 @@ const signToken = id => {
     })
 }
 
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user.id)
+    const cookieOption = {
+        expire: new Date(
+            Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+        ),
+        httpOnlny: true
+    }
+    res.cookie('jwt', token, cookieOption)
+
+    user.password = undefined
+
+    res.status(statusCode).json({
+        status: "Success",
+        token,
+        data: {
+            user
+        }
+    })
+}
+
 exports.registerUser = async (req, res) => {
     try {
 
@@ -25,13 +46,8 @@ exports.registerUser = async (req, res) => {
             password: req.body.password
         })
 
-        const token = signToken(newUser.id)
+        createSendToken(newUser, 201, res)
 
-        return res.status(201).json({
-            message: "Berhasil Register",
-            data: newUser,
-            token
-        })
     } catch (error) {
         console.log(error)
         return res.status(400).json({
@@ -67,17 +83,5 @@ exports.loginUser = async (req, res) => {
         })
     }
 
-    const { password, ...userWithoutPassword } = userData.toJSON();
-
-    // token di res pada login
-    const token = signToken(userData.id)
-    return res.status(200).json({
-        status: "Success",
-        message: "Berhasil Login",
-        data: {
-            user: userWithoutPassword,
-            token: token
-        },
-        
-    })
+    createSendToken(userData, 200, res)
 }
