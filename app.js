@@ -5,6 +5,7 @@ const cors = require('cors')
 const CategoriesRouter = require('./routes/categories')
 const AuthRouter = require('./routes/AuthRoutes')
 const morgan = require('morgan')
+const bodyParser = require('body-parser')
 
 dotenv.config();
 
@@ -14,8 +15,10 @@ app.use(express.json())
 //     req.requestTime = new Date().toISOString()
 //     next()
 // })
-app.use(morgan("dev"))
+// app.use(morgan("dev"))
 app.use(cors())
+//use body parser
+app.use(bodyParser.urlencoded({ extended: true }))
 
 //Routing
 app.use('/api/v1/categories', CategoriesRouter);
