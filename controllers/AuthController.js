@@ -4,7 +4,9 @@ const {
 const jwt = require('jsonwebtoken')
 
 const signToken = id => {
-    return jwt.sign({id}, process.env.JWT_SECRET, {
+    return jwt.sign({
+        id
+    }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN
     })
 }
@@ -15,7 +17,7 @@ const createSendToken = (user, statusCode, res) => {
         expire: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
-        httpOnlny: true
+        httpOnly: true
     }
     res.cookie('jwt', token, cookieOption)
 
@@ -65,7 +67,7 @@ exports.loginUser = async (req, res) => {
             message: "Error Validasi",
             error: "Please input Email or Password"
         })
-    } 
+    }
 
     // check jika user email yang di masukan di req sudah ada di DB dan password sudah benar yang di input di req
     const userData = await User.findOne({
@@ -74,7 +76,7 @@ exports.loginUser = async (req, res) => {
         }
     })
 
-    if(!userData || !(await userData.CorrectPassword(req.body.password, userData.password))) {
+    if (!userData || !(await userData.CorrectPassword(req.body.password, userData.password))) {
         return res.status(400).json({
             status: "Fail",
             message: "Error Login",
@@ -83,4 +85,15 @@ exports.loginUser = async (req, res) => {
     }
 
     createSendToken(userData, 200, res)
+}
+
+exports.logoutUser = async (req, res) => {
+    res.cookie('jwt', '', {
+        httpOnly:true,
+        expires: new Date(0)
+    })
+
+    res.status(200).json({
+        message: "Logout Berhasil"
+    })
 }
