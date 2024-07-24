@@ -23,7 +23,6 @@ const createSendToken = (user, statusCode, res) => {
 
     res.status(statusCode).json({
         status: "Success",
-        token,
         data: {
             user
         }
@@ -66,7 +65,7 @@ exports.loginUser = async (req, res) => {
             message: "Error Validasi",
             error: "Please input Email or Password"
         })
-    }
+    } 
 
     // check jika user email yang di masukan di req sudah ada di DB dan password sudah benar yang di input di req
     const userData = await User.findOne({

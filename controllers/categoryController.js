@@ -98,6 +98,4 @@ exports.deleteCategory = async (req, res) => {
         status: "success",
         message: `Data dengan id ${id} berhasil di hapus`
     })
-
-
 }
