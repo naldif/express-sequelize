@@ -5,6 +5,7 @@ const cors = require('cors')
 const CategoriesRouter = require('./routes/categories')
 const AuthRouter = require('./routes/AuthRoutes')
 const morgan = require('morgan')
+const cookieParse = require('cookie-parser')
 const bodyParser = require('body-parser')
 const { errorHandler, notFound } = require('./middleware/errorMiddleware')
 
@@ -12,7 +13,7 @@ dotenv.config();
 
 //Middleware
 app.use(express.json())
-
+app.use(cookieParse())
 // app.use((req, res, next) => {
 //     req.requestTime = new Date().toISOString()
 //     next()
