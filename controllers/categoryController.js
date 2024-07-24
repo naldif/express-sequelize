@@ -1,7 +1,7 @@
 const {
     Category
 } = require("../models")
-
+const asyncHandle = require('../middleware/asyncHandle')
 
 exports.getAllCategories = async (req, res) => {
     try {
@@ -19,59 +19,42 @@ exports.getAllCategories = async (req, res) => {
     }
 }
 
-exports.storeCategory = async (req, res) => {
-    // let name = req.body.name;
-    // let description = req.body.description;
-    try {
-        let {
-            name,
-            description
-        } = req.body
-        const newCategory = await Category.create({
-            name,
-            description
-        })
+exports.storeCategory = asyncHandle(async (req, res) => {
 
-        res.status(200).json({
-            status: "success",
-            data: newCategory
-        })
+    let {
+        name,
+        description
+    } = req.body
+    const newCategory = await Category.create({
+        name,
+        description
+    })
 
-    } catch (error) {
-        return res.status(400).json({
-            status: "fail",
-            error: error.errors
-        })
-    }
-}
+    res.status(200).json({
+        status: "success",
+        data: newCategory
+    })
+})
 
-exports.updateCategory = async (req, res) => {
+exports.updateCategory = asyncHandle(async (req, res) => {
 
-    try {
-        const id = req.params.id
-        await Category.update(req.body, {
-            where: {
-                id: id
-            }
-        });
-        const findCategory = await Category.findByPk(id);
-        if (!findCategory) {
-            return res.status(404).json({
-                status: "fail",
-                message: "Data tidak di temukan"
-            })
+    const id = req.params.id
+    await Category.update(req.body, {
+        where: {
+            id: id
         }
-        res.status(200).json({
-            status: "success",
-            data: findCategory
-        })
-    } catch (error) {
-        return res.status(500).json({
-            status: "fail",
-            error: 'server down'
-        })
+    });
+    const findCategory = await Category.findByPk(id);
+    if (!findCategory) {
+        res.status(404);
+        throw new Error("Category tidak ditemukan")
     }
-}
+    res.status(200).json({
+        status: "success",
+        data: findCategory
+    })
+
+})
 
 exports.detailCategory = async (req, res) => {
 
