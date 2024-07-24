@@ -35,7 +35,7 @@ exports.authMiddleware = async (req, res, next) => {
     if(!currentUser){
         return next(res.status(401).json({
             status: 401,
-            message: "User sudah terhapus token sudah tidak bisa di gunakan "
+            message: "User sudah terhapus, token sudah tidak bisa di gunakan "
         }))
     }
     req.user = currentUser;
