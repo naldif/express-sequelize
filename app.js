@@ -4,6 +4,7 @@ const dotenv = require('dotenv')
 const cors = require('cors')
 const CategoriesRouter = require('./routes/categories')
 const AuthRouter = require('./routes/AuthRoutes')
+const productRouter = require('./routes/productRouter')
 const morgan = require('morgan')
 const cookieParse = require('cookie-parser')
 const bodyParser = require('body-parser')
@@ -13,6 +14,7 @@ dotenv.config();
 
 //Middleware
 app.use(express.json())
+app.use(express.urlencoded({ extended: true}))
 app.use(cookieParse())
 // app.use((req, res, next) => {
 //     req.requestTime = new Date().toISOString()
@@ -20,12 +22,11 @@ app.use(cookieParse())
 // })
 // app.use(morgan("dev"))
 app.use(cors())
-//use body parser
-app.use(bodyParser.urlencoded({ extended: true }))
 
 //Routing
 app.use('/api/v1/categories', CategoriesRouter);
 app.use('/api/v1/auth', AuthRouter);
+app.use('/api/v1/product', productRouter);
 
 app.use(notFound)
 app.use(errorHandler)
