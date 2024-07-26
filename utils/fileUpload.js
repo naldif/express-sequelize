@@ -20,7 +20,7 @@ const storageFile = multer.diskStorage({
     filename: function (req, file, cb) {
         const fileName = file.originalname.split(' ').join('-')
         const extention = FILE_TYPE[file.mimetype]
-        const uniqueFileImage = fileName + Date.now() + "-" + '.' + extention
+        const uniqueFileImage = fileName + "-"  + Date.now() + '.' + extention
         cb(null, uniqueFileImage)
     }
 })

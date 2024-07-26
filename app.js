@@ -9,6 +9,7 @@ const morgan = require('morgan')
 const cookieParse = require('cookie-parser')
 const bodyParser = require('body-parser')
 const { errorHandler, notFound } = require('./middleware/errorMiddleware')
+const path = require('path')
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use(cookieParse())
 // })
 // app.use(morgan("dev"))
 app.use(cors())
+
+app.use('/public/uploads', express.static(path.join(__dirname + '/public/uploads')))
 
 //Routing
 app.use('/api/v1/categories', CategoriesRouter);
