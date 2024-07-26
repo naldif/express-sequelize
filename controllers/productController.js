@@ -2,6 +2,7 @@ const asyncHandle = require('../middleware/asyncHandle')
 const {
     Product
 } = require('../models')
+const fs = require('fs')
 
 exports.addProduct = asyncHandle(async (req, res) => {
     let {
@@ -56,6 +57,57 @@ exports.detailProduct = asyncHandle(async (req, res) => {
     }
 
     return res.status(200).json({
+        data: productData
+    })
+})
+
+exports.updateProduct = asyncHandle(async(req, res) => {
+
+    // request params & req bodt
+    const idParams = req.params.id
+    let {name, price, description, stock, categoryId} = req.body
+
+    // get data by id
+    const productData = await Product.findByPk(idParams)
+
+    if(!productData){
+        res.status(404)
+        throw new Error("Product id tidak ditemukan")
+    }
+
+    // request file
+    const file = req.file
+
+    // kondisi jika file gambar di ganti/ diupdate
+    if(file) {
+        // ambil file image yang lama
+        const nameImage = productData.image.replace(`${req.protocol}://${req.get('host')}/public/uploads/`, "")
+        // tempat file lama
+        const filePath = `./public/uploads/${nameImage}`
+        // fungsi hapus file
+        fs.unlink(filePath, (err) => {
+            if(err) {
+                res.status(400)
+                throw new Error("File tidak ditemukan")
+            }
+        })
+
+        const fileName = file.filename
+        const pathFile = `${req.protocol}://${req.get('host')}/public/uploads/${fileName}`
+
+        productData.image = pathFile
+    }
+
+    productData.name = name
+    productData.price = price
+    productData.description = description
+    productData.stock = stock
+    productData.categoryId = categoryId
+
+    productData.save();
+
+    return res.status(200).json({
+        message: "Berhasil update product",
         data: productData
     })
 })

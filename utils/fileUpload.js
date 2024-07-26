@@ -1,9 +1,10 @@
 const multer = require('multer')
+const path = require('path');
 
 const FILE_TYPE = {
     'image/png': 'png',
     'image/jpg': 'jpg',
-    'image/jpeg': 'jpeg'
+    'image/jpeg': 'jpeg',
 }
 
 const storageFile = multer.diskStorage({
@@ -18,9 +19,9 @@ const storageFile = multer.diskStorage({
         cb(uploadError, 'public/uploads')
     },
     filename: function (req, file, cb) {
-        const fileName = file.originalname.split(' ').join('-')
-        const extention = FILE_TYPE[file.mimetype]
-        const uniqueFileImage = fileName + "-"  + Date.now() + '.' + extention
+        // const extention = FILE_TYPE[file.mimetype]
+        const ext = path.extname(file.originalname);
+        const uniqueFileImage = `${file.fieldname}-${Date.now()}${ext}`
         cb(null, uniqueFileImage)
     }
 })
