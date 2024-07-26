@@ -3,10 +3,8 @@ const router = express.Router()
 const {
     addProduct
 } = require('../controllers/productController')
+const { uploadOption } = require('../utils/fileUpload')
 
-const multer = require('multer')
-const mulParse = multer()
-
-router.post('/', mulParse.none(), addProduct)
+router.post('/', uploadOption.single('image'), addProduct)
 
 module.exports = router
