@@ -15,7 +15,7 @@ exports.addProduct = asyncHandle(async (req, res) => {
 
     const file = req.file;
     // validasi jika file tidak di input
-    if(!file) {
+    if (!file) {
         res.status(400)
         throw new Error("Tidak ada image yang di input")
     }
@@ -23,25 +23,23 @@ exports.addProduct = asyncHandle(async (req, res) => {
     const fileName = file.filename
     const pathFile = `${req.protocol}://${req.get('host')}/public/uploads/${fileName}`
 
-    const newProduct = await Product.create(
-        {
-            name,
-            description, 
-            price,
-            categoryId,
-            stock,
-            image: pathFile,
-        }
-    )
+    const newProduct = await Product.create({
+        name,
+        description,
+        price,
+        categoryId,
+        stock,
+        image: pathFile,
+    })
 
     return res.status(200).json({
         data: newProduct
     })
 })
 
-exports.readProducts = asyncHandle(async(req, res) => {
+exports.readProducts = asyncHandle(async (req, res) => {
     const products = await Product.findAll();
-    
+
     return res.status(200).json({
         data: products
     })
@@ -51,7 +49,7 @@ exports.detailProduct = asyncHandle(async (req, res) => {
     const id = req.params.id
     const productData = await Product.findByPk(id)
 
-    if(!productData){
+    if (!productData) {
         res.status(404)
         throw new Error("Product id tidak ditemukan")
     }
@@ -61,16 +59,22 @@ exports.detailProduct = asyncHandle(async (req, res) => {
     })
 })
 
-exports.updateProduct = asyncHandle(async(req, res) => {
+exports.updateProduct = asyncHandle(async (req, res) => {
 
     // request params & req bodt
     const idParams = req.params.id
-    let {name, price, description, stock, categoryId} = req.body
+    let {
+        name,
+        price,
+        description,
+        stock,
+        categoryId
+    } = req.body
 
     // get data by id
     const productData = await Product.findByPk(idParams)
 
-    if(!productData){
+    if (!productData) {
         res.status(404)
         throw new Error("Product id tidak ditemukan")
     }
@@ -79,14 +83,14 @@ exports.updateProduct = asyncHandle(async(req, res) => {
     const file = req.file
 
     // kondisi jika file gambar di ganti/ diupdate
-    if(file) {
+    if (file) {
         // ambil file image yang lama
         const nameImage = productData.image.replace(`${req.protocol}://${req.get('host')}/public/uploads/`, "")
         // tempat file lama
         const filePath = `./public/uploads/${nameImage}`
         // fungsi hapus file
         fs.unlink(filePath, (err) => {
-            if(err) {
+            if (err) {
                 res.status(400)
                 throw new Error("File tidak ditemukan")
             }
@@ -98,11 +102,11 @@ exports.updateProduct = asyncHandle(async(req, res) => {
         productData.image = pathFile
     }
 
-    productData.name = name
-    productData.price = price
-    productData.description = description
-    productData.stock = stock
-    productData.categoryId = categoryId
+    productData.name = name || productData.name
+    productData.price = price || productData.price
+    productData.description = description || productData.description
+    productData.stock = stock || productData.stock
+    productData.categoryId = categoryId || productData.categoryId
 
     productData.save();
 
@@ -110,4 +114,34 @@ exports.updateProduct = asyncHandle(async(req, res) => {
         message: "Berhasil update product",
         data: productData
     })
+})
+
+exports.destroyProduct = asyncHandle(async (req, res) => {
+
+    const idParams = req.params.id
+    // get data product berdasarkan id
+    const productData = await Product.findByPk(idParams)
+
+    if (productData) {
+        // ambil file image yang lama
+        const nameImage = productData.image.replace(`${req.protocol}://${req.get('host')}/public/uploads/`, "")
+        // tempat file lama
+        const filePath = `./public/uploads/${nameImage}`
+        // fungsi hapus file
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                res.status(400)
+                throw new Error("File tidak ditemukan")
+            }
+        })
+
+        productData.destroy();
+
+        return res.status(200).json({
+            message: "Data berhasil dihapus"
+        })
+    }else{
+        res.status(404);
+        throw new Error("Product Id tidak ditemukan")
+    }
 })
