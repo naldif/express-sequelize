@@ -3,6 +3,9 @@ const {
     Product
 } = require('../models')
 const fs = require('fs')
+const {
+    Op
+} = require("sequelize")
 
 exports.addProduct = asyncHandle(async (req, res) => {
     let {
@@ -38,10 +41,30 @@ exports.addProduct = asyncHandle(async (req, res) => {
 })
 
 exports.readProducts = asyncHandle(async (req, res) => {
-    const products = await Product.findAll();
+
+    const {
+        search
+    } = req.query
+
+    let productData = ""
+    if (search) {
+        const products = await Product.findAll({
+            where: {
+                name: {
+                    [Op.like]: "%" + search + "%"
+                }
+            }
+        });
+
+        productData = products
+    } else {
+        const product = await Product.findAll()
+        productData = product
+    }
+
 
     return res.status(200).json({
-        data: products
+        data: productData
     })
 })
 
@@ -140,7 +163,7 @@ exports.destroyProduct = asyncHandle(async (req, res) => {
         return res.status(200).json({
             message: "Data berhasil dihapus"
         })
-    }else{
+    } else {
         res.status(404);
         throw new Error("Product Id tidak ditemukan")
     }
