@@ -43,22 +43,31 @@ exports.addProduct = asyncHandle(async (req, res) => {
 exports.readProducts = asyncHandle(async (req, res) => {
 
     const {
-        search
+        search,
+        limit,
+        page
     } = req.query
 
     let productData = ""
-    if (search) {
-        const products = await Product.findAll({
+    if (search || limit || page) {
+        const pageData = page * 1 || 1
+        const limitData = limit * 1 || 100 
+        const offsetData = (pageData - 1) * limitData
+        const searchData = search || ""
+        
+        const products = await Product.findAndCountAll({
+            limit : limitData,
+            offset : offsetData,
             where: {
                 name: {
-                    [Op.like]: "%" + search + "%"
+                    [Op.like]: "%" + searchData + "%"
                 }
             }
         });
 
         productData = products
     } else {
-        const product = await Product.findAll()
+        const product = await Product.findAndCountAll()
         productData = product
     }
 

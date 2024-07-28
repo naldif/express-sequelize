@@ -5,6 +5,7 @@ const cors = require('cors')
 const CategoriesRouter = require('./routes/categories')
 const AuthRouter = require('./routes/AuthRoutes')
 const productRouter = require('./routes/productRouter')
+const profileRouter = require('./routes/profileRouter')
 const morgan = require('morgan')
 const cookieParse = require('cookie-parser')
 const bodyParser = require('body-parser')
@@ -30,6 +31,7 @@ app.use('/public/uploads', express.static(path.join(__dirname + '/public/uploads
 app.use('/api/v1/categories', CategoriesRouter);
 app.use('/api/v1/auth', AuthRouter);
 app.use('/api/v1/product', productRouter);
+app.use('/api/v1/profile', profileRouter);
 
 app.use(notFound)
 app.use(errorHandler)
