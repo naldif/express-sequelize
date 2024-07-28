@@ -1,5 +1,7 @@
 const {
-    User
+    User,
+    Profile,
+    Role
 } = require('../models')
 const jwt = require('jsonwebtoken')
 
@@ -89,7 +91,7 @@ exports.loginUser = async (req, res) => {
 
 exports.logoutUser = async (req, res) => {
     res.cookie('jwt', '', {
-        httpOnly:true,
+        httpOnly: true,
         expires: new Date(0)
     })
 
@@ -99,14 +101,36 @@ exports.logoutUser = async (req, res) => {
 }
 
 exports.getMyUser = async (req, res) => {
-    const currentUser = await User.findByPk(req.user.id)
+    const currentUser = await User.findOne({
+        where: {
+            id: req.user.id
+        },
+        include: 
+        [
+            {
+                model: Role,
+                attributes: ["name"]
+            },
+            {
+                model: Profile,
+                attributes: {
+                    exclude: ["createdAt", "updatedAt", "userId"]
+                }
+            }
+        ],
+        attributes: {
+            exclude: ["createdAt", "updatedAt", "password"]
+        }
+    })
 
-    if(currentUser) {
-        return res.status(200).json({ 
-            id: currentUser.id,
-            name: currentUser.name,
-            email: currentUser.email,
-            role_id: currentUser.role_id
+    if (currentUser) {
+        const user = currentUser.toJSON();  // Convert Sequelize instance to plain object
+        user.role = user.Role.name; // Assign role name to user.role
+        delete user.Role; // Remove the Role object
+        delete user.role_id;
+        
+        return res.status(200).json({
+            data: user
         })
     }
 
