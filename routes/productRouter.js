@@ -8,12 +8,12 @@ const {
     destroyProduct
 } = require('../controllers/productController')
 const { uploadOption } = require('../utils/fileUpload')
-
-router.post('/', uploadOption.single('image'), addProduct)
+const { authMiddleware, permissionUser } = require('../middleware/UserMiddleware')
 
 router.get('/', readProducts)
-router.get('/:id', detailProduct)
-router.put('/:id', uploadOption.single('image'), updateProduct)
-router.delete('/:id', destroyProduct)
+router.post('/', uploadOption.single('image'), authMiddleware, permissionUser("admin"), addProduct)
+router.get('/:id', authMiddleware, detailProduct)
+router.put('/:id', uploadOption.single('image'), authMiddleware, permissionUser("admin"), updateProduct)
+router.delete('/:id', authMiddleware, permissionUser("admin"), destroyProduct)
 
 module.exports = router
