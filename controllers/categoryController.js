@@ -1,15 +1,23 @@
 const {
-    Category
+    Category,
+    Product
 } = require("../models")
 const asyncHandle = require('../middleware/asyncHandle')
 
 exports.getAllCategories = async (req, res) => {
     try {
-        const categories = await Category.findAll();
-
+        const categories = await Category.findAll({
+            include: [{
+                model: Product,
+                attributes: {
+                    exclude: ["createdAt", "updatedAt", "categoryId"]
+                },
+                as: 'products' // Alias defined in the association
+            }]
+        });
         return res.status(200).json({
             status: "success",
-            data: categories
+            data: categories,
         })
     } catch (error) {
         return res.status(500).json({

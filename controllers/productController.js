@@ -1,6 +1,7 @@
 const asyncHandle = require('../middleware/asyncHandle')
 const {
-    Product
+    Product,
+    Category
 } = require('../models')
 const fs = require('fs')
 const {
@@ -62,12 +63,31 @@ exports.readProducts = asyncHandle(async (req, res) => {
                 name: {
                     [Op.like]: "%" + searchData + "%"
                 }
-            }
+            },
+            include: [
+                {
+                    model: Category,
+                    attributes: {
+                        exclude: ["createdAt", "updatedAt", "description"]
+                    },
+                    as: 'category' 
+                }
+            ]
         });
 
         productData = products
     } else {
-        const product = await Product.findAndCountAll()
+        const product = await Product.findAndCountAll({
+            include: [
+                {
+                    model: Category,
+                    attributes: {
+                        exclude: ["createdAt", "updatedAt", "description"]
+                    },
+                    as: 'category' 
+                }
+            ]
+        })
         productData = product
     }
 
@@ -79,7 +99,17 @@ exports.readProducts = asyncHandle(async (req, res) => {
 
 exports.detailProduct = asyncHandle(async (req, res) => {
     const id = req.params.id
-    const productData = await Product.findByPk(id)
+    const productData = await Product.findByPk(id, {
+        include: [
+            {
+                model: Category,
+                attributes: {
+                    exclude: ["createdAt", "updatedAt", "description"]
+                },
+                as: 'category' 
+            }
+        ]
+    })
 
     if (!productData) {
         res.status(404)
